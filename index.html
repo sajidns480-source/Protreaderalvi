@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>𝗔𝗸𝗮𝘀𝗵®𝗝𝗮𝗻𝗻𝗮𝘁</title>
+    <style>
+        :root {
+            --primary: #00ff00;
+            --primary-glow: rgba(0, 255, 0, 0.4);
+            --telegram: #0088cc;
+            --telegram-glow: rgba(0, 136, 204, 0.5);
+            --bg-dark: #0a0a0c;
+            --glass: rgba(20, 20, 25, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
+            --text-muted: #8a8a93;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- Game Frame Background --- */
+        .game-frame { 
+            width: 100%; height: 100%; border: none; 
+            position: absolute; top: 0; left: 0; z-index: 1;
+        }
+
+        /* --- Canvas Background --- */
+        #bg-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* --- App Container (Smooth Performance Active) --- */
+        .app-container {
+            position: fixed;
+            z-index: 1000;
+            width: 155px; 
+            touch-action: none;
+            will-change: transform, top, left;
+            transform: translate3d(0,0,0);
+        }
+
+        /* --- Glassmorphism Card Structure --- */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 15px 10px 10px 10px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        /* RGB বর্ডার */
+        .rgb-box {
+            padding: 2px;
+            border-radius: 17px;
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            background-size: 400%;
+            animation: move-border 8s linear infinite;
+        }
+
+        @keyframes move-border {
+            0% { background-position: 0 0; }
+            50% { background-position: 400% 0; }
+            100% { background-position: 0 0; }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Typography --- */
+        h1.title {
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        h1.premium-title {
+            color: #00e5ff;
+            font-size: 9.5px;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .device-clock {
+            color: #888;
+            font-size: 8px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        /* --- Input --- */
+        .input-group {
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 8px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+            padding-left: 2px;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 7px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 11px;
+            text-align: center;
+            outline: none;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            width: 100%;
+            padding: 7px;
+            border: none;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #00ff00, #0088ff);
+            color: #000;
+            font-weight: 900;
+        }
+
+        .btn-aviator {
+            background: linear-gradient(90deg, #ff003c, #7a00ff);
+            color: #fff;
+            font-weight: 700;
+            margin-top: 6px;
+            box-shadow: 0 2px 8px rgba(255, 0, 60, 0.3);
+        }
+
+        .btn-telegram-login {
+            background: var(--telegram);
+            color: white;
+            margin-bottom: 6px;
+            font-size: 8px;
+        }
+
+        .btn-telegram {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            margin-top: 6px;
+            padding: 6px;
+        }
+
+        .error-msg {
+            color: #ff003c;
+            font-size: 9px;
+            margin-top: 4px;
+            min-height: 10px;
+        }
+
+        /* --- Main Display --- */
+        .display-container {
+            display: flex;
+            justify-content: center;
+            margin: 6px 0;
+            border-top: 1px solid #222;
+            padding-top: 6px;
+        }
+
+        .glowing-circle {
+            width: 110px; 
+            height: 110px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 0, 0.02) 0%, rgba(0, 0, 0, 0.6) 100%);
+            border: 2px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px var(--primary-glow), inset 0 0 10px var(--primary-glow);
+            position: relative;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .period-lbl {
+            font-size: 11px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 1px;
+        }
+
+        .signal-text {
+            font-size: 18px; 
+            font-weight: 900;
+        }
+        .big-signal { color: #00ff00; text-shadow: 0 0 10px #00ff00; }
+        .small-signal { color: #ff003c; text-shadow: 0 0 10px #ff003c; }
+        
+        .wait-signal { 
+            color: #ffaa00; 
+            text-shadow: 0 0 10px #ffaa00; 
+            font-size: 16px; 
+            opacity: 0.4;
+            animation: blinker 1s linear infinite; 
+        }
+
+        @keyframes blinker { 50% { opacity: 0.1; } }
+
+        /* এভিয়েটর কন্টেইনার */
+        .aviator-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .aviator-box {
+            font-size: 9px;
+            color: #ff003c;
+            font-weight: 900;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .aviator-box span { color: #fff; font-size: 10px; }
+
+        /* গুণের নিচে SUCCESS লেখা */
+        .success-lbl {
+            font-size: 8px;
+            font-weight: 900;
+            color: #00ff66;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+            text-shadow: 0 0 6px #00ff66;
+            display: none;
+        }
+
+        .timer-circle {
+            width: 26px; height: 26px; border: 1px solid #ff0055; border-radius: 50%;
+            margin: 4px auto 0 auto; display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 11px; font-weight: 900;
+        }
+    </style>
+</head>
+<body>
+
+    <iframe class="game-frame" src="https://11bdwin24.com/register?inviteCode=RERBGBW&from=web"></iframe>
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="app-container" id="draggable-panel" style="top: 25%; left: 15%;">
+        <div class="rgb-box">
+            
+            <div id="login-screen" class="glass-card">
+                <h1 class="title">𝗔𝗸𝗮𝘀𝗵®𝗝𝗮𝗻𝗻𝗮𝘁</h1>
+                <div class="input-group">
+                    <label for="password">PASSWORD</label>
+                    <input type="password" id="password" placeholder="••••">
+                </div>
+                <a href="https://t.me/Akash_51233" target="_blank" class="btn btn-telegram-login">GET PASSWORD</a>
+                <button class="btn btn-primary" onclick="validateLogin()">Login</button>
+                <div id="error-box" class="error-msg"></div>
+            </div>
+
+            <div id="main-screen" class="glass-card hidden">
+                <h1 class="title premium-title">𝗔𝗸𝗮𝘀𝗵®𝗝𝗮𝗻𝗻𝗮𝘁</h1>
+                <div class="device-clock" id="live-clock">00:00:00 PM</div>
+                
+                <div class="display-container">
+                    <div class="glowing-circle" id="shield">
+                        <div class="period-lbl" id="period-id">---</div>
+                        <div class="signal-text wait-signal" id="signal-label">WAIT...</div>
+                        
+                        <div class="aviator-container">
+                            <div class="aviator-box">AV: <span id="aviator-label">1.00x</span></div>
+                            <div class="success-lbl" id="success-text-label">SUCCESS</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timer-circle" id="timer-val">30</div>
+
+                <button class="btn btn-aviator" id="aviator-btn" onclick="generateAviatorSignal()">Get Aviator</button>
+
+                <a href="https://t.me/Akashbd244" target="_blank" class="btn btn-telegram">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.13 2.18a.5.5 0 0 0-.54-.11L1.8 8a.5.5 0 0 0-.01.93l6.22 2.68 10.3-6.57-6.57 10.3 2.68 6.22a.5.5 0 0 0 .93-.01l5.72-18.79a.5.5 0 0 0-.14-.54z"/></svg>
+                    Join Channel
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        var DEFAULT_PASS = "jannat24";
+        var currentActiveSignal = Math.random() > 0.5 ? "BIG" : "SMALL"; 
+        var isAviatorRunning = false;
+        var lastTriggeredPeriod = ""; // প্রতি সেকেন্ডে লুপ হওয়া এবং ডুপ্লিকেট টস হওয়া আটকানোর ফিক্স
+
+        // --- Optimized Web Audio ---
+        var audioCtx = null;
+        function playTickSound(frequency, duration) {
+            frequency = frequency || 580; duration = duration || 0.04;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                var osc = audioCtx.createOscillator(); var gain = audioCtx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        // --- Performance Optimized Background Particles ---
+        var canvas = document.getElementById('bg-canvas');
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        var Particle = function() { this.reset(); };
+        Particle.prototype.reset = function() {
+            this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 1.0 + 0.4; this.speedY = -(Math.random() * 0.2 + 0.1);
+            this.alpha = Math.random() * 0.3 + 0.1;
+        };
+        Particle.prototype.update = function() { this.y += this.speedY; if (this.y < 0) this.reset(); };
+        Particle.prototype.draw = function() {
+            ctx.fillStyle = 'rgba(255, 255, 255, ' + this.alpha + ')';
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+        };
+
+        for (var i = 0; i < 10; i++) { particles.push(new Particle()); }
+
+        function animateBg() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (var i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        // --- Touch Dragging System ---
+        const panel = document.getElementById('draggable-panel');
+        let isDragging = false, offX, offY;
+
+        panel.addEventListener('touchstart', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') {
+                isDragging = true;
+                offX = e.touches[0].clientX - panel.offsetLeft;
+                offY = e.touches[0].clientY - panel.offsetTop;
+            }
+        }, {passive: true});
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            let x = e.touches[0].clientX - offX; let y = e.touches[0].clientY - offY;
+            x = Math.max(0, Math.min(x, window.innerWidth - panel.offsetWidth));
+            y = Math.max(0, Math.min(y, window.innerHeight - panel.offsetHeight));
+            panel.style.left = x + 'px'; panel.style.top = y + 'px';
+        }, {passive: true});
+
+        document.addEventListener('touchend', () => isDragging = false);
+
+        // --- Login Controller ---
+        function validateLogin() {
+            var passInput = document.getElementById('password').value;
+            var errorBox = document.getElementById('error-box');
+            if (passInput === DEFAULT_PASS) {
+                document.getElementById('login-screen').classList.add('hidden');
+                setTimeout(function() {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('main-screen').classList.remove('hidden');
+                    startSignalEngine();
+                }, 400);
+            } else {
+                errorBox.textContent = "WRONG PASSWORD!";
+                playTickSound(150, 0.2);
+                setTimeout(function() { errorBox.textContent = ""; }, 3000);
+            }
+        }
+
+        // --- BIG/SMALL Core Engine (Fixed Toss System) ---
+        function startSignalEngine() {
+            // শুরুর প্রথম লোডেই একটা ফেয়ার টস নিয়ে নেবে
+            currentActiveSignal = Math.random() > 0.5 ? "BIG" : "SMALL";
+
+            setInterval(() => {
+                const now = new Date();
+                let hours = now.getHours();
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12; hours = hours ? hours : 12;
+                document.getElementById('live-clock').innerText = `${hours.toString().padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+
+                const currentSec = now.getSeconds();
+                const rem = 30 - (currentSec % 30);
+                document.getElementById('timer-val').innerText = rem;
+
+                const interval = Math.floor(((now.getHours() * 3600) + (now.getMinutes() * 60) + currentSec) / 30);
+                const currentPeriodStr = (interval + 1).toString().slice(-3);
+                document.getElementById('period-id').innerText = currentPeriodStr;
+
+                const label = document.getElementById('signal-label');
+                const shieldBox = document.getElementById('shield');
+
+                // ফিক্সড লজিক: প্রতি রাউন্ডের শুরুতে যখন টাইমার ৩০-এ আসবে এবং পিরিয়ড আইডি বদলাবে কেবল তখনই ১ বার ফেয়ার টস হবে।
+                if (rem === 30 && lastTriggeredPeriod !== currentPeriodStr) {
+                    lastTriggeredPeriod = currentPeriodStr;
+                    currentActiveSignal = Math.random() > 0.5 ? "BIG" : "SMALL";
+                    playTickSound(850, 0.12);
+                }
+
+                if (rem <= 5) {
+                    label.innerText = "WAIT...";
+                    label.className = "signal-text wait-signal";
+                    if(!isAviatorRunning) {
+                        shieldBox.style.borderColor = "#ffaa00";
+                        shieldBox.style.boxShadow = "0 0 15px rgba(255,170,0,0.4), inset 0 0 10px rgba(255,170,0,0.3)";
+                    }
+                } else {
+                    label.innerText = currentActiveSignal;
+                    if (currentActiveSignal === "BIG") {
+                        label.className = "signal-text big-signal";
+                        if(!isAviatorRunning) {
+                            shieldBox.style.borderColor = "#00ff00";
+                            shieldBox.style.boxShadow = "0 0 15px rgba(0,255,0,0.4), inset 0 0 10px rgba(0,255,0,0.3)";
+                        }
+                    } else {
+                        label.className = "signal-text small-signal";
+                        if(!isAviatorRunning) {
+                            shieldBox.style.borderColor = "#ff003c";
+                            shieldBox.style.boxShadow = "0 0 15px rgba(255,0,60,0.4), inset 0 0 10px rgba(255,0,60,0.3)";
+                        }
+                    }
+                }
+            }, 1000);
+        }
+
+        // --- Weighted Aviator Algorithm ---
+        function getWeightedAviatorMultiplier() {
+            var rand = Math.random();
+            if (rand < 0.60) return (Math.random() * 1.50 + 2.00).toFixed(2); 
+            else if (rand < 0.85) return (Math.random() * 0.89 + 1.10).toFixed(2); 
+            else if (rand < 0.97) return (Math.random() * 1.50 + 7.00).toFixed(2); 
+            else return (Math.random() * 4.50 + 3.51).toFixed(2);
+        }
+
+        // --- Aviator Signal Handler ---
+        function generateAviatorSignal() {
+            if (isAviatorRunning) return;
+            
+            isAviatorRunning = true;
+            
+            var btn = document.getElementById('aviator-btn');
+            var avLabel = document.getElementById('aviator-label');
+            var successLabel = document.getElementById('success-text-label');
+            var shieldBox = document.getElementById('shield');
+            
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            successLabel.style.display = "none"; 
+            
+            shieldBox.style.borderColor = "#00e5ff";
+            shieldBox.style.boxShadow = "0 0 15px rgba(0,229,255,0.6), inset 0 0 10px rgba(0,229,255,0.4)";
+
+            var iterations = 0;
+            var totalIterations = 15; 
+            var currentIntervalTime = 60;
+
+            function avCycle() {
+                iterations++;
+                var mockVal = (Math.random() * 8 + 1).toFixed(2);
+                avLabel.textContent = mockVal + "x";
+                
+                playTickSound(500 + (iterations * 20), 0.03);
+
+                if (iterations < totalIterations) {
+                    if (iterations > 10) currentIntervalTime += 40;
+                    setTimeout(avCycle, currentIntervalTime);
+                } else {
+                    var finalAviator = getWeightedAviatorMultiplier();
+                    avLabel.textContent = finalAviator + "x";
+                    
+                    successLabel.style.display = "block"; 
+                    
+                    shieldBox.style.borderColor = "#00ff66";
+                    shieldBox.style.boxShadow = "0 0 15px rgba(0,255,102,0.6), inset 0 0 10px rgba(0,255,102,0.4)";
+                    
+                    playTickSound(950, 0.15);
+                    
+                    setTimeout(function() {
+                        successLabel.style.display = "none";
+                        btn.disabled = false;
+                        btn.style.opacity = "1";
+                        isAviatorRunning = false;
+                    }, 3000); 
+                }
+            }
+            avCycle();
+        }
+    </script>
+</body>
+</html>
